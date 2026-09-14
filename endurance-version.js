@@ -1,5 +1,4 @@
 const IDLE_THRESHOLD_MS = 10000;
-const TASK_TYPE = "quantity_more_endurance";
 const MAX_QUESTIONS = 1000;
 const CHOICE_COUNTS = [2, 4, 6];
 const CLOUD_BATCH_SIZE = 20;
@@ -10,25 +9,17 @@ const CLOUD_ACK_POLL_ATTEMPTS = 5;
 const CLOUD_ACK_POLL_DELAY_MS = 700;
 const APP_VERSION = "endurance-github-pages-3";
 const LOG_HEADERS = [
-  "received_at",
   "session_id",
   "participant_id",
   "question_index",
-  "task_id",
-  "difficulty",
   "event_type",
-  "shown_at",
   "event_at",
   "response_time_ms",
   "is_correct",
-  "idle_detected",
-  "idle_count",
   "idle_total_ms",
   "rest_duration_ms",
-  "note",
-  "target_value",
-  "choice_value",
   "choice_count",
+  "dot_difference",
   "event_id"
 ];
 
@@ -52,7 +43,6 @@ let questionStart = 0;
 let questionRestMs = 0;
 let lastActionAt = 0;
 let idleStart = null;
-let idleCount = 0;
 let idleStoredMs = 0;
 let answeredCount = 0;
 let correctCount = 0;
@@ -398,13 +388,10 @@ function makeTask() {
   }));
 
   return {
-    id: `QM${String(questionIndex).padStart(4, "0")}`,
     options,
     counts,
     difference: maxCount - minCount,
-    targetKey: options[targetIndex].key,
-    targetValue: options[targetIndex].label,
-    difficulty: `choice_${choiceCount}_range_${maxCount - minCount}`
+    targetKey: options[targetIndex].key
   };
 }
 
@@ -449,7 +436,6 @@ function renderTask() {
   questionRestMs = 0;
   lastActionAt = questionStart;
   idleStart = null;
-  idleCount = 0;
   idleStoredMs = 0;
   isLocked = false;
 
@@ -525,48 +511,19 @@ function buildLog(eventType, choiceKey = "", extra = {}) {
   const now = Date.now();
   const isAnswer = eventType === "answer";
   const isCorrect = isAnswer && choiceKey === currentTask.targetKey;
-  const chosenOption = currentTask.options.find((option) => option.key === choiceKey);
-  const countSummary = currentTask.options
-    .map((option) => `${option.key}=${option.count}`)
-    .join("|");
-  const noteParts = [
-    `counts=${countSummary}`,
-    `correct_choice=${currentTask.targetKey}`,
-    `correct_count=${currentTask.options.find((option) => option.key === currentTask.targetKey).count}`,
-    `difference=${currentTask.difference}`,
-    `max_questions=${MAX_QUESTIONS}`,
-    `choice_count=${choiceCount}`,
-    `session_elapsed_ms=${Math.round(activeSessionElapsed(now))}`,
-    `session_rest_ms=${Math.round(sessionRestMs)}`,
-    "time_limit=none",
-    "active_time_excludes_rest=true",
-    "skip_button_removed=true"
-  ];
-
-  if (extra.note) noteParts.push(extra.note);
-  if (eventType === "end" || eventType === "max_questions") {
-    noteParts.push(`total_answered=${answeredCount}`, `total_correct=${correctCount}`);
-  }
 
   return {
     session_id: sessionId,
     participant_id: participantId,
     question_index: questionIndex,
-    task_id: currentTask.id,
-    difficulty: currentTask.difficulty,
     event_type: eventType,
-    shown_at: new Date(questionStart).toISOString(),
     event_at: new Date(now).toISOString(),
     response_time_ms: Math.round(activeQuestionElapsed(now)),
-    is_correct: isCorrect,
-    idle_detected: idleCount > 0,
-    idle_count: idleCount,
+    is_correct: isAnswer ? isCorrect : "",
     idle_total_ms: Math.round(currentIdleTotal(now)),
     rest_duration_ms: extra.rest_duration_ms || 0,
-    note: noteParts.join("; "),
-    target_value: `${countSummary}|correct=${currentTask.targetKey}`,
-    choice_value: chosenOption ? `${choiceKey}=${chosenOption.count}` : choiceKey,
-    choice_count: choiceCount
+    choice_count: choiceCount,
+    dot_difference: currentTask.difference,
   };
 }
 
@@ -602,8 +559,7 @@ function buildSelfReport(responseStatus) {
     difficulty_rating: responseStatus === "skipped" ? "" : selectedReportValue("difficultyRating"),
     external_interruption: responseStatus === "skipped" ? "" : selectedReportValue("externalInterruption"),
     other_reason: responseStatus === "skipped" ? "" : otherReasonInput.value.trim(),
-    response_status: responseStatus,
-    app_version: APP_VERSION
+    response_status: responseStatus
   };
 }
 
@@ -626,11 +582,8 @@ async function submitSelfReport(responseStatus) {
   restartBtn.disabled = false;
 }
 
-async function saveLog(log, options = {}) {
-  const localLog = {
-    ...log,
-    received_at: new Date().toISOString()
-  };
+async function saveLog(log) {
+  const localLog = { ...log };
   localLog.event_id = makeEventId("log", localLog);
   sessionLogs.push(localLog);
   backupLocalLogs();
@@ -662,7 +615,6 @@ function tick() {
 
   if (idleStart === null && now - lastActionAt >= IDLE_THRESHOLD_MS) {
     idleStart = lastActionAt + IDLE_THRESHOLD_MS;
-    idleCount += 1;
   }
 }
 
@@ -691,10 +643,7 @@ async function restTask() {
   if (isResting || isLocked || isFinished) return;
 
   resetIdleClock();
-  await saveLog(buildLog("rest", "", {
-    rest_duration_ms: restSeconds * 1000,
-    note: "rest_requested"
-  }));
+  await saveLog(buildLog("rest", "", { rest_duration_ms: restSeconds * 1000 }));
 
   isResting = true;
   restBtn.disabled = true;
@@ -749,7 +698,7 @@ async function finish(reason) {
   doneScreen.classList.add("active");
 
   if (sessionId && currentTask) {
-    await saveLog(buildLog(endEventType, "", { note: `reason=${reason}` }));
+    await saveLog(buildLog(endEventType));
   }
   const allDelivered = await flushAllCloudRecords();
 
@@ -810,11 +759,7 @@ async function start() {
     session_id: sessionId,
     participant_id: participantId,
     timer_visible: timerVisible,
-    rest_seconds: restSeconds,
-    max_questions: MAX_QUESTIONS,
-    task_type: TASK_TYPE,
-    user_agent: navigator.userAgent,
-    page_url: window.location.href,
+    rest_seconds: restSeconds
   });
 
   startScreen.style.display = "none";
