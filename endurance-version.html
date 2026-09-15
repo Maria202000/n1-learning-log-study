@@ -175,6 +175,15 @@
       line-height: 1.2;
     }
 
+    .timer-setting {
+      display: grid;
+      gap: 6px;
+      min-width: 0;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 800;
+    }
+
     .toggle input {
       width: 22px;
       height: 22px;
@@ -640,10 +649,6 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
-      #startBtn {
-        margin-top: 0;
-      }
-
       .task {
         padding: 20px;
       }
@@ -796,7 +801,7 @@
           <label>
             <span class="label-title"><ruby>個人<rt>こじん</rt></ruby>ID</span>
             <input id="participantInput" type="text" placeholder="学籍番号 または ID" autocomplete="off" required>
-            <span class="field-hint">2<ruby>回目<rt>かいめ</rt></ruby><ruby>以降<rt>いこう</rt></ruby>も、<ruby>前回<rt>ぜんかい</rt></ruby>と<ruby>同<rt>おな</rt></ruby>じIDを<ruby>入力<rt>にゅうりょく</rt></ruby>してください。</span>
+            <span class="field-hint"><ruby>毎回<rt>まいかい</rt></ruby>、<ruby>同<rt>おな</rt></ruby>じIDを<ruby>入力<rt>にゅうりょく</rt></ruby>してください。</span>
           </label>
           <label>
             <span class="label-title"><ruby>休<rt>やす</rt></ruby>む<ruby>時間<rt>じかん</rt></ruby></span>
@@ -809,10 +814,13 @@
               <option value="60">1分</option>
             </select>
           </label>
-          <label class="toggle">
-            <input id="timerToggle" type="checkbox" checked>
-            <span class="toggle-text"><ruby>時間<rt>じかん</rt></ruby>を<ruby>見<rt>み</rt></ruby>せる</span>
-          </label>
+          <div class="timer-setting">
+            <span class="label-title"><ruby>時間<rt>じかん</rt></ruby>の<ruby>表示<rt>ひょうじ</rt></ruby></span>
+            <label class="toggle">
+              <input id="timerToggle" type="checkbox" checked>
+              <span class="toggle-text"><ruby>時間<rt>じかん</rt></ruby>を<ruby>見<rt>み</rt></ruby>せる</span>
+            </label>
+          </div>
           <button class="primary" id="startBtn">
             <ruby>始<rt>はじ</rt></ruby>める
           </button>
