@@ -49,6 +49,7 @@
     }
 
     button {
+      min-width: 0;
       min-height: 54px;
       border: 2px solid var(--line);
       border-radius: 8px;
@@ -118,9 +119,13 @@
 
     .start-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      grid-template-columns: minmax(230px, 1.3fr) repeat(2, minmax(180px, 1fr)) minmax(190px, 1fr);
       gap: 12px;
-      align-items: end;
+      align-items: start;
+    }
+
+    .start-grid > label {
+      min-width: 0;
     }
 
     label {
@@ -193,6 +198,8 @@
 
     #startBtn {
       width: 100%;
+      align-self: start;
+      margin-top: 40px;
     }
 
     .workspace {
@@ -434,6 +441,7 @@
       font-weight: 700;
       line-height: 1.7;
       text-align: left;
+      overflow-wrap: anywhere;
     }
 
     .field-hint {
@@ -456,6 +464,7 @@
       border-radius: 8px;
       background: #edf4ff;
       text-align: left;
+      overflow-wrap: anywhere;
     }
 
     .delivery-status.success {
@@ -568,6 +577,7 @@
       font-size: 15px;
       font-weight: 800;
       cursor: pointer;
+      overflow-wrap: anywhere;
     }
 
     .report-option input {
@@ -626,6 +636,14 @@
     }
 
     @media (max-width: 1024px) {
+      .start-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      #startBtn {
+        margin-top: 0;
+      }
+
       .task {
         padding: 20px;
       }
@@ -669,6 +687,10 @@
         grid-template-columns: 1fr;
       }
 
+      #startBtn {
+        margin-top: 0;
+      }
+
       .choices {
         gap: 10px;
       }
@@ -695,6 +717,19 @@
       .report-actions {
         grid-template-columns: 1fr;
       }
+
+      .delivery-status {
+        grid-template-columns: 36px minmax(0, 1fr);
+        gap: 10px;
+        margin: 14px 0;
+        padding: 14px;
+      }
+
+      .delivery-icon {
+        width: 36px;
+        height: 36px;
+        font-size: 21px;
+      }
     }
 
     @media (max-width: 460px) {
@@ -710,6 +745,20 @@
 
       .metrics {
         grid-template-columns: 1fr;
+      }
+
+      .done-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .delivery-status {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+      }
+
+      .done-note {
+        text-align: center;
       }
 
       .question {
@@ -746,7 +795,7 @@
         <div class="start-grid">
           <label>
             <span class="label-title"><ruby>個人<rt>こじん</rt></ruby>ID</span>
-            <input id="participantInput" type="text" placeholder="学籍番号 または 自分で決めたID" autocomplete="off" required>
+            <input id="participantInput" type="text" placeholder="学籍番号 または ID" autocomplete="off" required>
             <span class="field-hint">2<ruby>回目<rt>かいめ</rt></ruby><ruby>以降<rt>いこう</rt></ruby>も、<ruby>前回<rt>ぜんかい</rt></ruby>と<ruby>同<rt>おな</rt></ruby>じIDを<ruby>入力<rt>にゅうりょく</rt></ruby>してください。</span>
           </label>
           <label>
