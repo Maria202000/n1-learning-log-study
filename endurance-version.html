@@ -493,10 +493,23 @@
       display: grid;
       gap: 16px;
       padding: 18px;
-      border: 1px solid var(--line);
+      border: 3px solid #d49a12;
       border-radius: 8px;
-      background: #fbfcfe;
+      background: #fffcf2;
       text-align: left;
+    }
+
+    .self-report-step {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #9a6700;
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 900;
     }
 
     .self-report h3 {
@@ -824,8 +837,9 @@
           </div>
         </section>
         <section class="self-report" id="selfReportPanel" aria-labelledby="selfReportTitle">
-          <h3 id="selfReportTitle"><ruby>テスト後<rt>ご</rt></ruby>のふりかえり</h3>
-          <p class="self-report-intro">答えたくない項目は空欄のままでも大丈夫です。</p>
+          <span class="self-report-step">最後のステップ</span>
+          <h3 id="selfReportTitle"><ruby>テスト後<rt>ご</rt></ruby>のふりかえりを<ruby>送<rt>おく</rt></ruby>ってください</h3>
+          <p class="self-report-intro">答えたくない項目は空欄のままでも大丈夫です。回答後は、下の「ふりかえりを送信して終了する」を押してください。</p>
 
           <fieldset class="report-field">
             <legend><ruby>終<rt>お</rt></ruby>わりにした<ruby>主<rt>おも</rt></ruby>な<ruby>理由<rt>りゆう</rt></ruby></legend>
@@ -904,7 +918,7 @@
 
           <p class="self-report-status" id="selfReportStatus" aria-live="polite"></p>
           <div class="report-actions">
-            <button class="primary" id="submitSelfReportBtn" type="button">ふりかえりを<ruby>送<rt>おく</rt></ruby>る</button>
+            <button class="primary" id="submitSelfReportBtn" type="button">ふりかえりを<ruby>送信<rt>そうしん</rt></ruby>して<ruby>終了<rt>しゅうりょう</rt></ruby>する</button>
             <button class="secondary" id="skipSelfReportBtn" type="button">答えないで<ruby>終<rt>お</rt></ruby>わる</button>
           </div>
         </section>
@@ -919,6 +933,6 @@
   </div>
 
   <script src="collector-config.js?v=20260914-collector-2"></script>
-  <script src="endurance-version.js?v=20260915-app-1"></script>
+  <script src="endurance-version.js?v=20260915-app-2"></script>
 </body>
 </html>

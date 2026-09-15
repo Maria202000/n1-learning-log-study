@@ -588,7 +588,7 @@ async function submitSelfReport(responseStatus) {
   selfReportStatus.textContent = succeeded
     ? responseStatus === "skipped"
       ? "回答しないことを記録しました。これで終了です。"
-      : "ふりかえりを送信しました。これで終了です。"
+      : "ふりかえりを送信しました。これで終了です。画面を閉じても大丈夫です。"
     : "ふりかえりを送信できませんでした。接続が回復すると再送します。";
   restartBtn.disabled = false;
 }
@@ -721,13 +721,13 @@ async function finish(reason) {
     setDeliveryStatus(
       "success",
       "データを送信しました",
-      "送信が終わりました。画面を閉じても大丈夫です。下のふりかえりに答えてください。"
+      "操作ログの送信が終わりました。続けて下のふりかえりを回答し、「ふりかえりを送信して終了する」を押してください。送信完了が表示されるまで、画面を閉じないでください。"
     );
   } else {
     setDeliveryStatus(
       "error",
       "データを送信できませんでした",
-      "CSVを保存して、研究者に渡してください。下のふりかえりにも答えてください。"
+      "CSVを保存して、研究者に渡してください。続けて下のふりかえりも回答し、「ふりかえりを送信して終了する」を押してください。"
     );
   }
   
