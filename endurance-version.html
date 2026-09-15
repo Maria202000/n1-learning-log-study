@@ -428,11 +428,65 @@
     }
 
     .done-note {
-      color: var(--muted);
-      font-size: 15px;
+      margin: 4px 0 0;
+      color: var(--ink);
+      font-size: 16px;
       font-weight: 700;
       line-height: 1.7;
       text-align: left;
+    }
+
+    .field-hint {
+      display: block;
+      margin-top: 7px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+
+    .delivery-status {
+      display: grid;
+      grid-template-columns: 42px minmax(0, 1fr);
+      gap: 12px;
+      align-items: center;
+      margin: 18px 0;
+      padding: 16px;
+      border: 2px solid #2d66da;
+      border-radius: 8px;
+      background: #edf4ff;
+      text-align: left;
+    }
+
+    .delivery-status.success {
+      border-color: #137f71;
+      background: #eaf8f4;
+    }
+
+    .delivery-status.error {
+      border-color: #c74b4b;
+      background: #fff1f1;
+    }
+
+    .delivery-icon {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff;
+      background: #2d66da;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .delivery-status.success .delivery-icon { background: #137f71; }
+    .delivery-status.error .delivery-icon { background: #c74b4b; }
+
+    .delivery-title {
+      display: block;
+      font-size: 18px;
+      line-height: 1.35;
     }
 
     .self-report {
@@ -680,6 +734,7 @@
           <label>
             <span class="label-title"><ruby>個人<rt>こじん</rt></ruby>ID</span>
             <input id="participantInput" type="text" placeholder="学籍番号 または 自分で決めたID" autocomplete="off" required>
+            <span class="field-hint">2<ruby>回目<rt>かいめ</rt></ruby><ruby>以降<rt>いこう</rt></ruby>も、<ruby>前回<rt>ぜんかい</rt></ruby>と<ruby>同<rt>おな</rt></ruby>じIDを<ruby>入力<rt>にゅうりょく</rt></ruby>してください。</span>
           </label>
           <label>
             <span class="label-title"><ruby>休<rt>やす</rt></ruby>む<ruby>時間<rt>じかん</rt></ruby></span>
@@ -761,7 +816,13 @@
             <span><ruby>時間<rt>じかん</rt></ruby></span>
           </div>
         </div>
-        <p class="done-note" id="doneNoteText">データを<ruby>送信中<rt>そうしんちゅう</rt></ruby>です。</p>
+        <section class="delivery-status sending" id="deliveryStatus" role="status" aria-live="polite">
+          <span class="delivery-icon" id="deliveryIcon" aria-hidden="true">!</span>
+          <div>
+            <strong class="delivery-title" id="deliveryTitle">データを<ruby>送信中<rt>そうしんちゅう</rt></ruby>です</strong>
+            <p class="done-note" id="doneNoteText">この<ruby>画面<rt>がめん</rt></ruby>を<ruby>閉<rt>と</rt></ruby>じずに、<ruby>送信<rt>そうしん</rt></ruby>が<ruby>終<rt>お</rt></ruby>わるまでお<ruby>待<rt>ま</rt></ruby>ちください。</p>
+          </div>
+        </section>
         <section class="self-report" id="selfReportPanel" aria-labelledby="selfReportTitle">
           <h3 id="selfReportTitle"><ruby>テスト後<rt>ご</rt></ruby>のふりかえり</h3>
           <p class="self-report-intro">答えたくない項目は空欄のままでも大丈夫です。</p>
@@ -858,6 +919,6 @@
   </div>
 
   <script src="collector-config.js?v=20260914-collector-2"></script>
-  <script src="endurance-version.js?v=20260914-app-2"></script>
+  <script src="endurance-version.js?v=20260915-app-1"></script>
 </body>
 </html>

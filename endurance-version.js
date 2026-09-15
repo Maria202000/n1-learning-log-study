@@ -74,6 +74,9 @@ const timerMetric = document.getElementById("timerMetric");
 const doneTitle = document.getElementById("doneTitle");
 const doneAnsweredText = document.getElementById("doneAnsweredText");
 const doneTimeText = document.getElementById("doneTimeText");
+const deliveryStatus = document.getElementById("deliveryStatus");
+const deliveryIcon = document.getElementById("deliveryIcon");
+const deliveryTitle = document.getElementById("deliveryTitle");
 const doneNoteText = document.getElementById("doneNoteText");
 const downloadCsvBtn = document.getElementById("downloadCsvBtn");
 const selfReportPanel = document.getElementById("selfReportPanel");
@@ -152,10 +155,11 @@ function downloadCsv() {
   }
 
   downloadLogArray(sessionLogs, makeCsvFilename());
-  if (doneNoteText) {
-    doneNoteText.textContent =
-      "CSVを保存しました。通常は端末の「ダウンロード」に保存されています。研究者に渡してください。";
-  }
+  setDeliveryStatus(
+    "error",
+    "CSVを保存しました",
+    "通常は端末の「ダウンロード」に保存されています。研究者に渡してください。"
+  );
 }
 
 function getCollectorUrl() {
@@ -199,6 +203,13 @@ function cloudPayload(type, data) {
     app_version: APP_VERSION,
     data
   };
+}
+
+function setDeliveryStatus(state, title, message) {
+  deliveryStatus.className = `delivery-status ${state}`;
+  deliveryIcon.textContent = state === "success" ? "✓" : "!";
+  deliveryTitle.textContent = title;
+  doneNoteText.textContent = message;
 }
 
 async function postToCollector(type, data) {
@@ -684,11 +695,13 @@ async function finish(reason) {
   }
   doneAnsweredText.textContent = answeredCount;
   doneTimeText.textContent = formatSeconds(activeSessionElapsed());
-  if (doneNoteText) {
-    doneNoteText.textContent = reachedMaximum
-      ? "ご協力ありがとうございました。データを送信しています。画面を閉じずにお待ちください。"
-      : "データを送信しています。画面を閉じずにお待ちください。";
-  }
+  setDeliveryStatus(
+    "sending",
+    "データを送信中です",
+    reachedMaximum
+      ? "ご協力ありがとうございます。この画面を閉じずに、送信が終わるまでお待ちください。"
+      : "この画面を閉じずに、送信が終わるまでお待ちください。"
+  );
   if (downloadCsvBtn) {
     downloadCsvBtn.hidden = true;
     downloadCsvBtn.disabled = true;
@@ -704,10 +717,18 @@ async function finish(reason) {
 
   const automaticCollectionSucceeded =
     Boolean(collectorUrl) && allDelivered && cloudOutbox.length === 0;
-  if (doneNoteText) {
-    doneNoteText.textContent = automaticCollectionSucceeded
-      ? "データを送信しました。下のふりかえりに答えてください。"
-      : "データを自動送信できませんでした。CSVを保存して、研究者に渡してください。下のふりかえりにも答えてください。";
+  if (automaticCollectionSucceeded) {
+    setDeliveryStatus(
+      "success",
+      "データを送信しました",
+      "送信が終わりました。画面を閉じても大丈夫です。下のふりかえりに答えてください。"
+    );
+  } else {
+    setDeliveryStatus(
+      "error",
+      "データを送信できませんでした",
+      "CSVを保存して、研究者に渡してください。下のふりかえりにも答えてください。"
+    );
   }
   
   if (downloadCsvBtn) {
